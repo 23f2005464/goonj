@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, MapPin, Clock, Music, Star, ChevronDown, Mic2, Drama, Drum } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import HeroSVG from '../assets/img2.svg'
 
 const COUNTDOWN_TARGET = new Date('2026-03-17T14:00:00')
 
@@ -56,9 +57,9 @@ function CountdownUnit({ value, label }) {
 }
 
 const highlights = [
-  { emoji: '💃', title: 'Classical Dance', desc: 'Bharatanatyam, Kathak and vibrant folk traditions performed by talented artists' },
+  { emoji: '🎵', title: 'Music', desc: 'Soulful vocals, instrumental fusion and group singing celebrating India\'s musical richness' },
+  { emoji: '💃', title: 'Dance', desc: 'Bharatanatyam, Kathak and vibrant folk traditions performed by talented artists' },
   { emoji: '🎭', title: 'Drama & Theater', desc: 'Gripping one-act plays and mime performances that move hearts and spark conversations' },
-  { emoji: '🎵', title: 'Live Music', desc: 'Soulful vocals, instrumental fusion and group singing celebrating India\'s musical richness' },
   { emoji: '🥁', title: 'Cultural Showcase', desc: 'A grand celebration of Gujarat\'s heritage through art, costume and storytelling' },
 ]
 
@@ -86,11 +87,16 @@ export default function HomePage() {
           minHeight: '100vh',
           position: 'relative',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
+          gap: 'clamp(20px, 5vw, 60px)',
           overflow: 'hidden',
           padding: '100px 24px 80px',
+          flexWrap: 'wrap',
+          '@media (maxWidth: 1024px)': {
+            flexDirection: 'column',
+          }
         }}
       >
         {/* Multi-layer gradient background */}
@@ -136,10 +142,41 @@ export default function HomePage() {
           }} />
         ))}
 
+        {/* ── Image Column (Left) ── */}
+        <div style={{
+          flex: '1 1 280px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minWidth: 200,
+          zIndex: 2,
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? 'translateX(0)' : 'translateX(-40px)',
+          transition: 'opacity 0.9s ease, transform 0.9s ease',
+        }}>
+          <img 
+            src={HeroSVG} 
+            alt="GOONJ 2026 Festival"
+            loading="lazy"
+            style={{
+              width: 'clamp(600px, 100%, 110px)',
+              height: 'auto',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 10px 40px rgba(0,0,0,0.3))',
+            }}
+          />
+        </div>
+
+        {/* ── Content Column (Right) ── */}
+        <div style={{
+          flex: '1 1 300px',
+        }}>
+
         {/* ── Content ── */}
         <div style={{
           position: 'relative', zIndex: 3,
           textAlign: 'center',
+          margin:'0px,0px , 0px',
           maxWidth: 760,
           opacity: mounted ? 1 : 0,
           transform: mounted ? 'translateY(0)' : 'translateY(24px)',
@@ -152,17 +189,17 @@ export default function HomePage() {
             background: 'rgba(255,255,255,0.14)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255,255,255,0.28)',
-            borderRadius: 30, padding: '8px 22px',
+            borderRadius: 30, padding: '20px 22px',
             color: 'rgba(255,255,255,0.92)',
             fontFamily: "'Rajdhani', sans-serif",
-            fontWeight: 600, fontSize: 13,
+            fontWeight: 600, fontSize: 16,
             letterSpacing: 2, textTransform: 'uppercase',
             marginBottom: 24,
             opacity: mounted ? 1 : 0,
             transform: mounted ? 'translateY(0)' : 'translateY(12px)',
             transition: 'opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s',
           }}>
-            JP Arts & Science College, Bharuch · Presents
+           Government Engineering College, Bharuch · Presents
           </div>
 
           {/* Event label */}
@@ -272,7 +309,7 @@ export default function HomePage() {
             transition: 'opacity 0.8s ease 0.65s',
           }}>
             <Link to="/register" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 10,
+              display: 'inline-flex', alignItems: 'center', gap: 9,
               background: 'white',
               color: '#c45c00',
               borderRadius: 50,
@@ -290,25 +327,9 @@ export default function HomePage() {
               <Star size={18} /> Register Free
             </Link>
 
-            <Link to="/performances" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 10,
-              background: 'transparent',
-              color: 'white',
-              borderRadius: 50,
-              padding: '16px 36px',
-              fontFamily: "'Baloo 2', cursive",
-              fontWeight: 700, fontSize: 16,
-              textDecoration: 'none',
-              border: '2px solid rgba(255,255,255,0.5)',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 0.2s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.8)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)' }}
-            >
-              <Music size={16} /> Past Performances
-            </Link>
+          
           </div>
+        </div>
         </div>
 
         {/* Scroll indicator */}
@@ -379,16 +400,16 @@ export default function HomePage() {
 
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 2 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🎟️</div>
+          <h2><span style={{ color: '#ffffff' }}>Limited Seats available !</span></h2>
           <h2 style={{
             fontFamily: "'Baloo 2', cursive",
             fontSize: 'clamp(28px, 5vw, 42px)',
             fontWeight: 800, color: '#f5a623',
             marginBottom: 14,
           }}>Grab Your Free Entry Pass</h2>
-          <p style={{ color: '#aaa', fontSize: 16, lineHeight: 1.8, marginBottom: 36 }}>
-            Register now and receive your personalized <strong style={{ color: 'white' }}>QR code pass</strong> via email.
-            Show it at the gate for instant entry — completely free!
-          </p>
+          <p style={{ color: 'white', fontSize: 16, lineHeight: 1.8, marginBottom: 36 }}>
+            Register now and wait for your confirmationfor the entry.</p> 
+        
           <Link to="/register" style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
             background: 'linear-gradient(135deg, #e07b00, #f5a623)',
@@ -405,9 +426,10 @@ export default function HomePage() {
           >
             Register Now — It's Free 🎉
           </Link>
-          <p style={{ color: '#555', fontSize: 13, marginTop: 20 }}>
-            Convener: <span style={{ color: '#f5a623' }}>Prof. Swaral Naik</span> &nbsp;·&nbsp;
-            Coordinator: <span style={{ color: '#f5a623' }}>Hariom Dave — 79907 41568</span>
+          <p style={{ color: '#fbf8f8', fontSize: 15, marginTop: 20 }}>
+            Convener: <span style={{ color: '#f5a623' }}><strong>Prof. Swaral Naik</strong></span> &nbsp;&nbsp;
+            Coordinator: <span style={{ color: '#f5a623' }}><strong>Hariom Dave — 79907 41568</strong></span>&nbsp;&nbsp;
+            Principal: <span style={{ color: '#f5a623' }}><strong>Dr.  P.P Lodha</strong> </span>
           </p>
         </div>
       </section>

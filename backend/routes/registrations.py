@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.database import get_db, Registration
 from models.schemas import RegistrationCreate, RegistrationResponse, QRVerifyRequest, QRVerifyResponse
@@ -14,7 +14,6 @@ router = APIRouter(prefix="/api/registrations", tags=["registrations"])
 @router.post("/", response_model=RegistrationResponse)
 async def register(
     data: RegistrationCreate,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     # Check existing email
@@ -22,9 +21,7 @@ async def register(
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    qr_token = generate_qr_token()
-    generate_qr_image(qr_token, data.full_name)
-
+    # Create registration with pending status — email will be sent only after admin approval
     reg = Registration(
         full_name=data.full_name,
         email=data.email,
@@ -33,32 +30,15 @@ async def register(
         department=data.department,
         year=data.year,
         event_interest=data.event_interest,
-        qr_code=qr_token,
+        qr_code=None,  # Will be generated on approval
+        status="pending",
+        email_sent=False
     )
     db.add(reg)
     db.commit()
     db.refresh(reg)
 
-    # Send email in background
-    background_tasks.add_task(
-        send_and_update_email,
-        reg.id,
-        data.email,
-        data.full_name,
-        qr_token,
-        db
-    )
-
     return reg
-
-
-async def send_and_update_email(reg_id: int, email: str, name: str, token: str, db: Session):
-    sent = await send_registration_email(email, name, token)
-    if sent:
-        reg = db.query(Registration).filter(Registration.id == reg_id).first()
-        if reg:
-            reg.email_sent = True
-            db.commit()
 
 
 @router.post("/verify-qr", response_model=QRVerifyResponse)

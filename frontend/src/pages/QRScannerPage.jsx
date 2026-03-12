@@ -304,8 +304,8 @@ export default function QRScannerPage() {
                 {[
                   [<User size={14} />, 'Name', result.registration.full_name],
                   [<Mail size={14} />, 'Email', result.registration.email],
-                  [<GraduationCap size={14} />, 'College', result.registration.college],
-                  [null, 'Department', result.registration.department],
+                  [null, 'Enrollment', result.registration.enrollment],
+                  [<GraduationCap size={14} />, 'Department', result.registration.department],
                   [null, 'Year', result.registration.year],
                 ].map(([icon, label, val], i) => (
                   <div key={i} style={{

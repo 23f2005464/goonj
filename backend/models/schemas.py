@@ -7,22 +7,24 @@ class RegistrationCreate(BaseModel):
     full_name: str
     email: EmailStr
     phone: str
-    college: str
+    enrollment: str
     department: str
     year: str
     event_interest: Optional[str] = None
-
 
 class RegistrationResponse(BaseModel):
     id: int
     full_name: str
     email: str
     phone: str
-    college: str
     department: str
+    enrollment: str
     year: str
     event_interest: Optional[str]
-    qr_code: str
+
+    status: str   # NEW FIELD
+
+    qr_code: Optional[str]
     is_attended: bool
     attended_at: Optional[datetime]
     registered_at: datetime
@@ -36,7 +38,6 @@ class RegistrationUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
-    college: Optional[str] = None
     department: Optional[str] = None
     year: Optional[str] = None
     event_interest: Optional[str] = None

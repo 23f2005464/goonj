@@ -6,19 +6,17 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import api from '../utils/api'
 
-const years = ['1st Year', '2nd Year', '3rd Year', 'PG 1st Year', 'PG 2nd Year', 'Faculty', 'Other']
-const events = ['Classical Dance', 'Folk Dance', 'Western Dance', 'Vocal Music', 'Instrumental', 'Drama/Theater', 'Mime', 'General Audience']
+const years = ['Sem 2', 'Sem 4', 'Sem 6', 'Sem 8']
 const departments = ['Computer Engineering', 'Electronics and Communication', 'Mechanical Engineering', 'Civil Engineering', 'Chemical Engineering', 'Electrical Engineering']
 export default function RegisterPage() {
   const [form, setForm] = useState({
-  full_name: '',
-  email: '',
-  phone: '',
-  enrollment: '',   // ✅ add this
-  department: '',
-  year: '',
-  event_interest: ''
-})
+    full_name: '',
+    email: '',
+    phone: '',
+    enrollment: '',   // ✅ add this
+    department: '',
+    year: '',
+  })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(null)
@@ -48,7 +46,7 @@ export default function RegisterPage() {
     try {
       const { data } = await api.post('/api/registrations/', form)
       setSuccess(data)
-      toast.success('Registration successful! Check your email for QR code.')
+      toast.success('Registration submitted! Waiting for admin approval.')
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Registration failed. Please try again.')
     } finally {
@@ -79,9 +77,10 @@ export default function RegisterPage() {
             <h2 style={{ fontFamily: "'Baloo 2', cursive", fontSize: 32, fontWeight: 800, color: '#1a1a2e', marginBottom: 8 }}>
               You're Registered!
             </h2>
-            <p style={{ color: '#666', fontSize: 15, lineHeight: 1.9, marginBottom: 24 }}>
+            <p style={{ color: '#666', fontSize: 15, lineHeight: 1.9, marginBottom: 24,fontFamily: "'Inter', sans-serif" }}>
               Welcome <strong style={{ color: '#e07b00' }}>{success.full_name}</strong>! 🎊<br />
-              Your <strong>QR entry pass</strong> has been sent to<br />
+              Your registration request has been submitted.<br />
+              As limited seats are available you will receive a confirmation email from our team for your entry pass<br />
               <strong style={{ color: '#1a1a2e' }}>{success.email}</strong>
             </p>
             <div style={{
@@ -96,7 +95,7 @@ export default function RegisterPage() {
             </div>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <Link to="/" className="btn btn-primary">Back to Home</Link>
-              <Link to="/performances" className="btn btn-outline">See Past Shows</Link>
+              <Link to="/performances" className="btn btn-outline">Youtube Link</Link>
             </div>
           </div>
         </div>
@@ -162,8 +161,8 @@ export default function RegisterPage() {
             textShadow: '0 4px 20px rgba(0,0,0,0.2)',
             marginBottom: 12, lineHeight: 1.1,
           }}>
-            Register for<br />
-            <span style={{ color: '#ffd700' }}>Goonj 2026</span>
+            Register for Your Entry Pass <br />
+            <span style={{ color: '#ffd700' }}>at Goonj 2026</span>
           </h1>
 
           <p style={{
@@ -171,12 +170,13 @@ export default function RegisterPage() {
             maxWidth: 400, margin: '0 auto 28px',
             lineHeight: 1.7,
           }}>
-            Fill in your details and instantly receive your personalized QR entry pass via email
+
+          Fill in your details and instantly receive your personalized QR code
           </p>
 
           {/* Event chips */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
-            {['📅 17 March 2026', '🕑 2:00 – 5:00 PM', '📍 JP College, Bharuch'].map((chip, i) => (
+            {['📅 17 March 2026', '🕑 2:00 – 5:00 PM', '📍 JP Arts & Science College, Bharuch'].map((chip, i) => (
               <span key={i} style={{
                 background: 'rgba(255,255,255,0.15)',
                 border: '1px solid rgba(255,255,255,0.25)',
@@ -372,28 +372,12 @@ export default function RegisterPage() {
                     value={form.year}
                     onChange={e => handleChange('year', e.target.value)}
                   >
-                    <option value="">Select your year</option>
+                    <option value="">Select your semester</option>
                     {years.map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
                 {errors.year && <p className="rg-err">⚠ {errors.year}</p>}
               </div>
-
-              {/* Event Interest */}
-              <div className="rg-full">
-                <label className="rg-label" style={{ color: '#aaa', fontWeight: 600 }}>
-                  Interested In <span style={{ fontWeight: 400 }}>(optional)</span>
-                </label>
-                <select
-                  className="rg-input rg-select rg-no-icon"
-                  value={form.event_interest}
-                  onChange={e => handleChange('event_interest', e.target.value)}
-                >
-                  <option value="">Select your interest</option>
-                  {events.map(ev => <option key={ev} value={ev}>{ev}</option>)}
-                </select>
-              </div>
-
             </div>
 
             {/* Divider */}
@@ -425,11 +409,11 @@ export default function RegisterPage() {
                 letterSpacing: 0.5,
               }}
             >
-              {loading ? '⏳ Registering...' : '🎉 Register & Get My QR Pass'}
+              {loading ? '⏳ Registering...' : '🎉 Submit Registration Request'}
             </button>
 
-            <p style={{ textAlign: 'center', color: '#ccc', fontSize: 12, marginTop: 14 }}>
-              Free entry · No spam · QR pass sent instantly to your email
+            <p style={{ textAlign: 'center', color: '#777575', fontSize: 16, marginTop: 14 }}>
+              Grab Fast — Limited Seats Available !
             </p>
           </form>
         </div>

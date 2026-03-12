@@ -1,13 +1,11 @@
 import qrcode
 import uuid
 import os
-from PIL import Image, ImageDraw
-import io
 import base64
+from io import BytesIO
+from PIL import Image
 
-
-QR_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "qrcodes")
-os.makedirs(QR_DIR, exist_ok=True)
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static", "qrcodes")
 
 
 def generate_qr_token() -> str:
@@ -15,7 +13,9 @@ def generate_qr_token() -> str:
 
 
 def generate_qr_image(token: str, name: str) -> str:
-    """Generate QR code image and save it. Returns filename."""
+    """Generate QR code, save to disk, and return the base64-encoded PNG string."""
+    os.makedirs(STATIC_DIR, exist_ok=True)
+
     qr = qrcode.QRCode(
         version=2,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -25,26 +25,13 @@ def generate_qr_image(token: str, name: str) -> str:
     qr.add_data(token)
     qr.make(fit=True)
 
-    img = qr.make_image(fill_color="#1a1a2e", back_color="white")
+    img = qr.make_image(fill_color="#1a1a2e", back_color="white").convert("RGB")
 
-    # Convert to RGBA for potential overlay
-    img = img.convert("RGBA")
+    # Save to disk (for scanner page to serve via /static)
+    file_path = os.path.join(STATIC_DIR, f"{token}.png")
+    img.save(file_path)
 
-    filename = f"{token}.png"
-    filepath = os.path.join(QR_DIR, filename)
-    img.save(filepath)
-
-    return filename
-
-
-def get_qr_base64(token: str) -> str:
-    """Return base64 encoded QR image for email embedding."""
-    filepath = os.path.join(QR_DIR, f"{token}.png")
-    if os.path.exists(filepath):
-        with open(filepath, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-
-    # Generate if not exists
-    generate_qr_image(token, "")
-    with open(filepath, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+    # Also return as base64 for inline email embedding
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")

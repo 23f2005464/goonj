@@ -49,7 +49,7 @@ export default function Footer() {
           <div>
             <h3 style={{ fontFamily: "'Baloo 2', cursive", color: '#f5a623', marginBottom: 16, fontSize: 18 }}>Quick Links</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[['/', 'Home'], ['/register', 'Register Now'], ['/performances', 'Past Performances']].map(([to, label]) => (
+              {[['/', 'Home'], ['/register', 'Register Now']].map(([to, label]) => (
                 <Link key={to} to={to} style={{ color: '#bbb', textDecoration: 'none', fontSize: 14, transition: 'color 0.2s' }}
                   onMouseEnter={e => e.target.style.color = '#f5a623'}
                   onMouseLeave={e => e.target.style.color = '#bbb'}
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: '1px solid #2d2d4e', paddingTop: 24, textAlign: 'center', fontSize: 13, color: '#666' }}>
-          <p>© 2026 Goonj — JP Arts and Science College, Bharuch. All rights reserved.</p>
+          <p>© 2026 Goonj — Government Engineering College, Bharuch. All rights reserved.</p>
           <p style={{ marginTop: 6 }}>Convener: <span style={{ color: '#f5a623' }}>Prof. Swaral Naik</span></p>
         </div>
       </div>

@@ -5,7 +5,6 @@ import { Menu, X } from 'lucide-react'
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/register', label: 'Register' },
-  { to: '/performances', label: 'Past Performances' },
 ]
 
 export default function Navbar() {

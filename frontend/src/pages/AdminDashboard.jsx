@@ -40,7 +40,7 @@ function EditRegModal({ reg, onClose, onSave }) {
     full_name: reg.full_name,
     email: reg.email,
     phone: reg.phone,
-    college: reg.college,
+    enrollment: reg.enrollment,
     department: reg.department,
     year: reg.year,
     event_interest: reg.event_interest || '',
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
   }
 
   const fetchStats = useCallback(async () => {
-    try { const { data } = await api.get('/api/admin/stats'); setStats(data) } catch {}
+    try { const { data } = await api.get('/api/admin/stats'); setStats(data) } catch { }
   }, [])
 
   const fetchRegistrations = useCallback(async () => {
@@ -218,14 +218,14 @@ export default function AdminDashboard() {
     try {
       const { data } = await api.get(`/api/admin/registrations?search=${encodeURIComponent(search)}`)
       setRegistrations(data)
-    } catch {}
+    } catch { }
     setLoading(false)
   }, [search])
 
   const fetchPerformances = useCallback(async () => {
     setLoading(true)
     try { const { data } = await api.get('/api/admin/performances'); setPerformances(data) }
-    catch {}
+    catch { }
     setLoading(false)
   }, [])
 
@@ -249,6 +249,24 @@ export default function AdminDashboard() {
       setRegistrations(r => r.map(x => x.id === id ? data : x))
       fetchStats()
     } catch { toast.error('Failed') }
+  }
+
+  const approveRegistration = async (id) => {
+    try {
+      const { data } = await api.post(`/api/admin/registrations/${id}/approve`)
+      setRegistrations(r => r.map(x => x.id === id ? {...x, status: 'approved', email_sent: true} : x))
+      fetchStats()
+      toast.success('Registration approved and email sent!')
+    } catch { toast.error('Approval failed') }
+  }
+
+  const rejectRegistration = async (id) => {
+    try {
+      const { data } = await api.post(`/api/admin/registrations/${id}/reject`)
+      setRegistrations(r => r.map(x => x.id === id ? {...x, status: 'rejected'} : x))
+      fetchStats()
+      toast.success('Registration rejected')
+    } catch { toast.error('Rejection failed') }
   }
 
   const deletePerf = async (id) => {
@@ -398,7 +416,7 @@ export default function AdminDashboard() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                     <thead>
                       <tr style={{ background: '#1a1a2e', color: 'white' }}>
-                        {['ID', 'Name', 'Email', 'College', 'Year', 'Attendance', 'Registered', 'Actions'].map(h => (
+                        {['ID', 'Name', 'Email', 'Department', 'Year', 'Status', 'Attendance', 'Registered', 'Actions'].map(h => (
                           <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontFamily: "'Baloo 2', cursive", fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap' }}>{h}</th>
                         ))}
                       </tr>
@@ -409,8 +427,48 @@ export default function AdminDashboard() {
                           <td style={{ padding: '12px 16px', color: '#888', fontWeight: 600 }}>#{r.id}</td>
                           <td style={{ padding: '12px 16px', fontWeight: 600, color: '#1a1a2e', whiteSpace: 'nowrap' }}>{r.full_name}</td>
                           <td style={{ padding: '12px 16px', color: '#555' }}>{r.email}</td>
-                          <td style={{ padding: '12px 16px', color: '#555', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.college}</td>
+                          <td style={{ padding: '12px 16px', color: '#555', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.department}</td>
                           <td style={{ padding: '12px 16px', color: '#555' }}>{r.year}</td>
+                          <td style={{ padding: '12px 16px' }}>
+                            {r.status === "pending" && (
+                              <span style={{
+                                background: '#fff3cd',
+                                color: '#856404',
+                                padding: '4px 10px',
+                                borderRadius: 12,
+                                fontSize: 12,
+                                fontWeight: 700
+                              }}>
+                                Pending
+                              </span>
+                            )}
+
+                            {r.status === "approved" && (
+                              <span style={{
+                                background: '#d4edda',
+                                color: '#155724',
+                                padding: '4px 10px',
+                                borderRadius: 12,
+                                fontSize: 12,
+                                fontWeight: 700
+                              }}>
+                                Approved
+                              </span>
+                            )}
+
+                            {r.status === "rejected" && (
+                              <span style={{
+                                background: '#f8d7da',
+                                color: '#721c24',
+                                padding: '4px 10px',
+                                borderRadius: 12,
+                                fontSize: 12,
+                                fontWeight: 700
+                              }}>
+                                Rejected
+                              </span>
+                            )}
+                          </td>
                           <td style={{ padding: '12px 16px' }}>
                             <button
                               onClick={() => toggleAttendance(r.id)}
@@ -433,7 +491,23 @@ export default function AdminDashboard() {
                             {new Date(r.registered_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
                           </td>
                           <td style={{ padding: '12px 16px' }}>
-                            <div style={{ display: 'flex', gap: 6 }}>
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                              {r.status === 'pending' && (
+                                <>
+                                  <button
+                                    onClick={() => approveRegistration(r.id)}
+                                    className="btn btn-sm"
+                                    style={{ background: '#d4edda', color: '#155724', border: 'none', borderRadius: 8, padding: '6px 10px', fontWeight: 600, cursor: 'pointer' }}
+                                    title="Approve and send QR email"
+                                  ><CheckCircle size={13} /> Approve</button>
+                                  <button
+                                    onClick={() => rejectRegistration(r.id)}
+                                    className="btn btn-sm"
+                                    style={{ background: '#f8d7da', color: '#721c24', border: 'none', borderRadius: 8, padding: '6px 10px', fontWeight: 600, cursor: 'pointer' }}
+                                    title="Reject this registration"
+                                  ><XCircle size={13} /> Reject</button>
+                                </>
+                              )}
                               <button
                                 onClick={() => setEditReg(r)}
                                 className="btn btn-sm"

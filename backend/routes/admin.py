@@ -7,8 +7,11 @@ from models.schemas import (
     AdminLogin, TokenResponse, StatsResponse
 )
 from utils.auth import verify_admin, create_access_token, verify_token
+from utils.email_utils import send_registration_email
+from utils.qr_utils import generate_qr_token
 from typing import List
 from datetime import datetime
+from uuid import uuid4
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -49,7 +52,7 @@ def list_registrations(
         q = q.filter(
             Registration.full_name.ilike(f"%{search}%") |
             Registration.email.ilike(f"%{search}%") |
-            Registration.college.ilike(f"%{search}%")
+            Registration.department.ilike(f"%{search}%")
         )
     return q.order_by(Registration.registered_at.desc()).offset(skip).limit(limit).all()
 
@@ -80,6 +83,59 @@ def update_registration(
     db.commit()
     db.refresh(reg)
     return reg
+
+
+@router.get("/registrations/pending", response_model=List[RegistrationResponse])
+def pending_registrations(db: Session = Depends(get_db), _=Depends(verify_token)):
+    return db.query(Registration).filter(
+        Registration.status == "pending"
+    ).order_by(Registration.registered_at.desc()).all()
+
+
+@router.post("/registrations/{reg_id}/approve")
+async def approve_registration(
+    reg_id: int,
+    db: Session = Depends(get_db),
+    _=Depends(verify_token)
+):
+    reg = db.query(Registration).filter(Registration.id == reg_id).first()
+
+    if not reg:
+        raise HTTPException(status_code=404, detail="Registration not found")
+
+    if reg.status == "approved":
+        return {"message": "Already approved"}
+
+    # Generate QR token
+    token = str(uuid4())
+    reg.qr_code = token
+    reg.status = "approved"
+
+    # Send approval email with QR code
+    await send_registration_email(reg.email, reg.full_name, token)
+    reg.email_sent = True
+
+    db.commit()
+    db.refresh(reg)
+
+    return {"message": "Registration approved and email sent", "registration": reg}
+
+
+@router.post("/registrations/{reg_id}/reject")
+def reject_registration(
+    reg_id: int,
+    db: Session = Depends(get_db),
+    _=Depends(verify_token)
+):
+    reg = db.query(Registration).filter(Registration.id == reg_id).first()
+
+    if not reg:
+        raise HTTPException(status_code=404, detail="Registration not found")
+
+    reg.status = "rejected"
+    db.commit()
+
+    return {"message": "Registration rejected"}
 
 
 @router.delete("/registrations/{reg_id}")
