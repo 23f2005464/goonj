@@ -252,20 +252,25 @@ export default function AdminDashboard() {
   }
 
   const approveRegistration = async (id) => {
+    const loadingToast = toast.loading('Approving and sending email...')
     try {
       const { data } = await api.post(`/api/admin/registrations/${id}/approve`)
-      setRegistrations(r => r.map(x => x.id === id ? {...x, status: 'approved', email_sent: true} : x))
+      setRegistrations(r => r.map(x => x.id === id ? data : x))
       fetchStats()
-      toast.success('Registration approved and email sent!')
-    } catch { toast.error('Approval failed') }
+      toast.dismiss(loadingToast)
+      toast.success('✅ Approved! QR sent to email')
+    } catch (err) { 
+      toast.dismiss(loadingToast)
+      toast.error('Approval failed') 
+    }
   }
 
   const rejectRegistration = async (id) => {
     try {
       const { data } = await api.post(`/api/admin/registrations/${id}/reject`)
-      setRegistrations(r => r.map(x => x.id === id ? {...x, status: 'rejected'} : x))
+      setRegistrations(r => r.map(x => x.id === id ? data : x))
       fetchStats()
-      toast.success('Registration rejected')
+      toast.success('❌ Registration rejected')
     } catch { toast.error('Rejection failed') }
   }
 
