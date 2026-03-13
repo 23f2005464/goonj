@@ -78,7 +78,7 @@ export default function RegisterPage() {
               Wait for Your Final Entry Pass!
             </h2>
             <p style={{ color: '#666', fontSize: 15, lineHeight: 1.9, marginBottom: 24, fontFamily: "'Inter', sans-serif" }}>
-              Welcome <strong style={{ color: '#e07b00' }}>{success.full_name}</strong>! 🎊<br />
+             <strong style={{ color: '#e07b00' }}>{success.full_name}</strong>! 🎊<br />
               Your registration request has been submitted.<br />
               As limited seats are available you will receive a confirmation email from our team for your entry pass<br />
               <strong style={{ color: '#1a1a2e' }}>{success.email}</strong>
