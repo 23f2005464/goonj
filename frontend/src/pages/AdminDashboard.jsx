@@ -13,6 +13,42 @@ const TABS = [
   { id: 'performances', label: 'Performances', icon: <Film size={18} /> },
 ]
 
+// ── CSV Download ───────────────────────────────
+function downloadCSV(registrations) {
+  const headers = [
+    'ID', 'Full Name', 'Email', 'Phone', 'Enrollment',
+    'Department', 'Year', 'Event Interest', 'Status',
+    'Attendance', 'Registered At'
+  ]
+
+  const rows = registrations.map(r => [
+    r.id,
+    r.full_name,
+    r.email,
+    r.phone || '',
+    r.enrollment || '',
+    r.department || '',
+    r.year || '',
+    r.event_interest || '',
+    r.status,
+    r.is_attended ? 'Present' : 'Absent',
+    new Date(r.registered_at).toLocaleString('en-IN'),
+  ])
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `goonj2026_registrations_${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+  toast.success('CSV downloaded!')
+}
+
 // ── Stat Card ─────────────────────────────────────
 function StatCard({ label, value, color, icon }) {
   return (
@@ -259,9 +295,9 @@ export default function AdminDashboard() {
       fetchStats()
       toast.dismiss(loadingToast)
       toast.success('✅ Approved! QR sent to email')
-    } catch (err) { 
+    } catch (err) {
       toast.dismiss(loadingToast)
-      toast.error('Approval failed') 
+      toast.error('Approval failed')
     }
   }
 
@@ -412,6 +448,27 @@ export default function AdminDashboard() {
                 <button onClick={fetchRegistrations} className="btn btn-outline btn-sm">
                   <RefreshCw size={14} /> Refresh
                 </button>
+                {/* ── CSV Download Button ── */}
+                <button
+                  onClick={() => downloadCSV(registrations)}
+                  disabled={registrations.length === 0}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '10px 18px',
+                    borderRadius: 30,
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+                    color: 'white',
+                    fontFamily: "'Baloo 2', cursive",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: registrations.length === 0 ? 'not-allowed' : 'pointer',
+                    opacity: registrations.length === 0 ? 0.5 : 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <Download size={16} /> Export CSV
+                </button>
               </div>
             </div>
 
@@ -436,42 +493,13 @@ export default function AdminDashboard() {
                           <td style={{ padding: '12px 16px', color: '#555' }}>{r.year}</td>
                           <td style={{ padding: '12px 16px' }}>
                             {r.status === "pending" && (
-                              <span style={{
-                                background: '#fff3cd',
-                                color: '#856404',
-                                padding: '4px 10px',
-                                borderRadius: 12,
-                                fontSize: 12,
-                                fontWeight: 700
-                              }}>
-                                Pending
-                              </span>
+                              <span style={{ background: '#fff3cd', color: '#856404', padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>Pending</span>
                             )}
-
                             {r.status === "approved" && (
-                              <span style={{
-                                background: '#d4edda',
-                                color: '#155724',
-                                padding: '4px 10px',
-                                borderRadius: 12,
-                                fontSize: 12,
-                                fontWeight: 700
-                              }}>
-                                Approved
-                              </span>
+                              <span style={{ background: '#d4edda', color: '#155724', padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>Approved</span>
                             )}
-
                             {r.status === "rejected" && (
-                              <span style={{
-                                background: '#f8d7da',
-                                color: '#721c24',
-                                padding: '4px 10px',
-                                borderRadius: 12,
-                                fontSize: 12,
-                                fontWeight: 700
-                              }}>
-                                Rejected
-                              </span>
+                              <span style={{ background: '#f8d7da', color: '#721c24', padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>Rejected</span>
                             )}
                           </td>
                           <td style={{ padding: '12px 16px' }}>
