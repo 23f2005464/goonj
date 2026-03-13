@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, MapPin, Clock, Star, ChevronDown } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import HeroSVG from '../assets/img2.svg'
+import HeroSVG from '../assets/img2.png'
 
 const COUNTDOWN_TARGET = new Date('2026-03-17T14:00:00')
 
