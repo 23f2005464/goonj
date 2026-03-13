@@ -1,57 +1,46 @@
-import aiosmtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
+import httpx
 import os
 import base64
 import qrcode
+from io import BytesIO
 
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USER = os.getenv("SMTP_USER", "")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", "")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
 FROM_NAME = os.getenv("FROM_NAME", "Goonj 2026")
 
 
 async def send_registration_email(email: str, name: str, token: str) -> bool:
     """
-    Send confirmation email with QR code embedded as Base64 inline image.
-    The QR image is generated fresh here so it never depends on a public URL.
+    Send confirmation email with QR code embedded as Base64 inline image via Resend HTTP API.
     """
     try:
         qr_base64 = _make_qr_base64(token)
         html = _build_html(name, token, qr_base64)
-        msg = MIMEMultipart("related")
-        
-        msg["Subject"] = "🎉 Goonj 2026 – Your Entry QR Pass"
-        msg["From"] = f"{FROM_NAME} <{FROM_EMAIL}>"
-        msg["To"] = email
-      
 
-        msg_alt = MIMEMultipart("alternative")
-        msg.attach(msg_alt)
+        payload = {
+            "from": f"{FROM_NAME} <{FROM_EMAIL}>",
+            "to": [email],
+            "subject": "🎉 Goonj 2026 – Your Entry QR Pass",
+            "html": html,
+        }
 
-        msg_alt.attach(MIMEText(html, "html"))
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=30,
+            )
 
-        # Attach QR image
-        img_data = base64.b64decode(qr_base64)
-        image = MIMEImage(img_data)
-        image.add_header("Content-ID", "<qr_code>")
-        image.add_header("Content-Disposition", "inline", filename="qr.png")
-
-        msg.attach(image)
-
-        await aiosmtplib.send(
-            msg,
-            hostname=SMTP_HOST,
-            port=SMTP_PORT,
-            username=SMTP_USER,
-            password=SMTP_PASSWORD,
-            start_tls=True,
-        )
-        print(f"[EMAIL] Sent to {email}")
-        return True
+        if response.status_code == 200 or response.status_code == 201:
+            print(f"[EMAIL] Sent to {email}")
+            return True
+        else:
+            print(f"[EMAIL ERROR] Resend returned {response.status_code}: {response.text}")
+            return False
 
     except Exception as e:
         print(f"[EMAIL ERROR] {e}")
@@ -60,9 +49,6 @@ async def send_registration_email(email: str, name: str, token: str) -> bool:
 
 def _make_qr_base64(token: str) -> str:
     """Generate a fresh QR PNG and return it as a base64 string."""
-    import qrcode, base64
-    from io import BytesIO
-
     qr = qrcode.QRCode(
         version=2,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -108,7 +94,7 @@ def _build_html(name: str, token: str, qr_base64: str) -> str:
           </td>
         </tr>
 
-        <!-- QR Code Section — Base64 inline, no external URL -->
+        <!-- QR Code Section — Base64 inline -->
         <tr>
           <td style="padding:36px 32px;text-align:center;background:#fffdf5;">
             <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#e07b00;
@@ -119,13 +105,12 @@ def _build_html(name: str, token: str, qr_base64: str) -> str:
             <div style="margin:20px auto;display:inline-block;border:3px solid #e07b00;
                         border-radius:16px;padding:16px;background:white;
                         box-shadow:0 4px 20px rgba(224,123,0,0.15);">
-              <!-- ✅ Inline Base64 image — works in all email clients, no server needed -->
               <img
-                  src="cid:qr_code"
-  alt="Your Entry QR Code"
-  width="220"
-  height="220"
-  style="display:block;border-radius:8px;"
+                  src="data:image/png;base64,{qr_base64}"
+                  alt="Your Entry QR Code"
+                  width="220"
+                  height="220"
+                  style="display:block;border-radius:8px;"
               />
             </div>
             <p style="margin:8px 0 0;color:#999;font-size:12px;font-family:monospace;">
