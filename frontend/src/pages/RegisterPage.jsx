@@ -219,9 +219,6 @@ export default function RegisterPage() {
             fontFamily: "'Baloo 2', cursive",
             fontSize: 26, fontWeight: 800, color: '#1a1a2e', marginBottom: 4,textAlign: 'center',
           }}>Register yourself for entry pass</h2>
-          <p style={{ color: '#bbb', fontSize: 13, marginBottom: 36 }}>
-            Fields marked * are required
-          </p>
 
           {/* All styles isolated in a style tag — avoids inline style object recreations */}
           <style>{`
