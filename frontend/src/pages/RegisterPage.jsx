@@ -217,7 +217,7 @@ export default function RegisterPage() {
         }}>
           <h2 style={{
             fontFamily: "'Baloo 2', cursive",
-            fontSize: 26, fontWeight: 800, color: '#1a1a2e', marginBottom: 4,textAlign: 'center',
+            fontSize: 26, fontWeight: 800, color: '#1a1a2e', marginBottom: 8,textAlign: 'center',
           }}>Register yourself for entry pass</h2>
 
           {/* All styles isolated in a style tag — avoids inline style object recreations */}
