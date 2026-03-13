@@ -215,6 +215,10 @@ export default function RegisterPage() {
           boxShadow: '0 20px 60px rgba(224,123,0,0.11), 0 4px 16px rgba(0,0,0,0.05)',
           border: '1.5px solid #f0e0c0',
         }}>
+          <p style={{
+  fontFamily: "'Baloo 2', cursive",
+  fontSize: 16, fontWeight: 500, color: '#555', marginTop: 0, marginBottom: 16,
+}}>Register yourself for entry pass</p>
           <h2 style={{
             fontFamily: "'Baloo 2', cursive",
             fontSize: 26, fontWeight: 800, color: '#1a1a2e', marginBottom: 4,
