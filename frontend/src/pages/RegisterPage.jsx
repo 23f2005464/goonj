@@ -93,10 +93,6 @@ export default function RegisterPage() {
               🕑 2:00 PM – 5:00 PM<br />
               📍 Indoor Auditorium, JP Arts & Science College, Bharuch
             </div>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <Link to="/" className="btn btn-primary">Back to Home</Link>
-              <Link to="/performances" className="btn btn-outline">Youtube Link</Link>
-            </div>
           </div>
         </div>
         <Footer />
