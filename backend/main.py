@@ -53,6 +53,6 @@ def root():
     return {"message": "Goonj 2026 API is running 🎉", "docs": "/docs"}
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     return {"status": "ok"}
