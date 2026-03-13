@@ -321,7 +321,7 @@ export default function RegisterPage() {
                     value={form.phone}
                     onChange={e => handleChange('phone', e.target.value)}
                     autoComplete="tel"
-                    maxLength={15}
+                    maxLength={10}
                   />
                 </div>
                 {errors.phone && <p className="rg-err">⚠ {errors.phone}</p>}
