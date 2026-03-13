@@ -12,6 +12,21 @@ import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboard from './pages/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
+// Keep Render backend alive - ping every 5 minutes
+const BACKEND_URL = import.meta.env.VITE_API_URL
+
+setInterval(async () => {
+  try {
+    await fetch(`${BACKEND_URL}/health`)
+    console.log('[KEEP-ALIVE] pinged backend')
+  } catch (e) {
+    // silent fail
+  }
+}, 5 * 60 * 1000) 
+
+
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
