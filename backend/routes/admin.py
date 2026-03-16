@@ -42,7 +42,7 @@ def get_stats(db: Session = Depends(get_db), _=Depends(verify_token)):
 @router.get("/registrations", response_model=List[RegistrationResponse])
 def list_registrations(
     skip: int = 0,
-    limit: int = 200,
+    limit: int = 1000,
     search: str = "",
     db: Session = Depends(get_db),
     _=Depends(verify_token)
