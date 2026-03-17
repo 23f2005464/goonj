@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 // 🔁 Replace this with your actual YouTube Live video ID or embed URL
-const YOUTUBE_VIDEO_ID = 'live_stream_id_here'
+const YOUTUBE_VIDEO_ID = '1ed4xaAbW80'
 
 export default function RegisterPage() {
   return (
